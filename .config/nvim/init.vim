@@ -1,5 +1,6 @@
 set nocompatible
 
+" Configure Plug dependencies
 call plug#begin('~/.vim/plugged')
 Plug 'ctrlpvim/ctrlp.vim'
 Plug 'editorconfig/editorconfig-vim'
@@ -20,6 +21,8 @@ Plug 'neomake/neomake'
 Plug 'ekalinin/Dockerfile.vim'
 Plug 'OmniSharp/omnisharp-vim'
 Plug 'posva/vim-vue'
+Plug 'jremmen/vim-ripgrep'
+Plug 'mileszs/ack.vim'
 
 " Color schemes
 Plug 'fatih/molokai'
@@ -34,9 +37,6 @@ Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
 
 " Initialize plugin system
 call plug#end()
-
-let g:python3_host_prog = expand('~/neovim-venv/bin/python3')
-
 let g:deoplete#enable_at_startup = 1
 
 " Set leader key
@@ -49,6 +49,10 @@ if exists('$TMUX')
   if has('nvim')
     set termguicolors
   endif
+endif
+
+if executable('rg')
+  let g:ackprg = 'rg --vimgrep'
 endif
 
 set ttyfast
