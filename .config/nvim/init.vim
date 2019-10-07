@@ -34,6 +34,9 @@ Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
 
 " Initialize plugin system
 call plug#end()
+
+let g:python3_host_prog = expand('~/neovim-venv/bin/python3')
+
 let g:deoplete#enable_at_startup = 1
 
 " Set leader key
