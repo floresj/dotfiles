@@ -19,10 +19,18 @@ Plug 'elzr/vim-json'
 Plug 'majutsushi/tagbar'
 Plug 'neomake/neomake'
 Plug 'ekalinin/Dockerfile.vim'
-Plug 'OmniSharp/omnisharp-vim'
 Plug 'posva/vim-vue'
-Plug 'jremmen/vim-ripgrep'
 Plug 'mileszs/ack.vim'
+
+" Nerdtree (if vim-vinegar isn't enough)
+Plug 'scrooloose/nerdtree'
+
+" YAML
+Plug 'pearofducks/ansible-vim'
+
+" Markdown
+Plug 'godlygeek/tabular'
+Plug 'plasticboy/vim-markdown'
 
 " Color schemes
 Plug 'fatih/molokai'
@@ -37,7 +45,12 @@ Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
 
 " Initialize plugin system
 call plug#end()
+
+" Enable deoplete
 let g:deoplete#enable_at_startup = 1
+
+" Set up python3
+let g:python3_host_prog = expand('$HOME/neovim-python3/bin/python3')
 
 " Set leader key
 let g:mapleader=","
@@ -190,8 +203,6 @@ let g:go_list_autoclose = 1
 let g:go_metalinter_autosave = 1
 let g:go_metalinter_autosave_enabled = ['vet'] " Only use govet
 let g:go_metalinter_enabled = ['vet', 'errcheck']
-"let g:go_metalinter_autosave_enabled = ['vet', 'golint'] " Only use govet
-"let g:go_metalinter_enabled = ['vet', 'golint', 'errcheck']
 
 
 au FileType go nmap <leader>gr <Plug>(go-rename)
@@ -206,13 +217,6 @@ au FileType go nmap <leader>gD :GoDoc<CR>
 au FileType go nmap <leader>gcs :GoDecls<CR>
 au FileType go nmap <leader>gb :GoBuild<CR>
 
-"""""""""""""""""""""""""""""""""""""
-" C#
-"" """"""""""""""""""""""""""""""""""
-let g:OmniSharp_server_stdio = 1
-let g:OmniSharp_server_use_mono = 1
-autocmd FileType cs setlocal omnifunc=OmniSharp#Complete
-
 
 """"""""""""""""""""""""""""""""""""""
 " Misc
@@ -223,3 +227,19 @@ autocmd BufReadPost *
      \   exe "normal! g`\"" |
      \ endif
 nmap <leader>S :source $MYVIMRC<cr>
+
+
+""""""""""""""""""""""""""""""""""""""
+" Nerd Commenter
+""""""""""""""""""""""""""""""""""""""
+"  Align line-wise comment delimiters flush left instead of following code indentation
+let g:NERDDefaultAlign = 'left'
+
+
+""""""""""""""""""""""""""""""""""""""
+" Nerd Tree
+""""""""""""""""""""""""""""""""""""""
+let g:NERDTreeDirArrowExpandable = '▸'
+let g:NERDTreeDirArrowCollapsible = '▾'
+let NERDTreeHijackNetrw = 0
+map <leader>nt :NERDTreeToggle<CR>
