@@ -1,72 +1,71 @@
-set nocompatible
-
 " Configure Plug dependencies
 call plug#begin('~/.vim/plugged')
-Plug 'ctrlpvim/ctrlp.vim'
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
+Plug 'junegunn/fzf'
 Plug 'editorconfig/editorconfig-vim'
 Plug 'scrooloose/nerdcommenter'
 Plug 'jlanzarotta/bufexplorer'
 Plug 'tpope/vim-fugitive'
-Plug 'tpope/vim-vinegar'
 Plug 'tpope/vim-surround'
+Plug 'nvim-tree/nvim-web-devicons'
 Plug 'fatih/hclfmt'
 Plug 'fatih/vim-hclfmt'
 Plug 'b4b4r07/vim-hcl'
 Plug 'hashivim/vim-terraform'
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
-Plug 'elzr/vim-json'
 Plug 'majutsushi/tagbar'
-Plug 'neomake/neomake'
 Plug 'ekalinin/Dockerfile.vim'
 Plug 'posva/vim-vue'
 Plug 'mileszs/ack.vim'
-
-" Nerdtree (if vim-vinegar isn't enough)
-Plug 'scrooloose/nerdtree'
-
-" YAML
-Plug 'pearofducks/ansible-vim'
-
-" Markdown
-Plug 'godlygeek/tabular'
+Plug 'cespare/vim-toml'
+Plug 'othree/html5.vim'
+Plug 'mzlogin/vim-markdown-toc'
+Plug 'dhruvasagar/vim-table-mode'
 Plug 'plasticboy/vim-markdown'
+" If you have nodejs and yarn
+Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app && yarn install'  }
+Plug 'jparise/vim-graphql'
+Plug 'prisma/vim-prisma'
+Plug 'luukvbaal/nnn.nvim'
+Plug 'stevearc/oil.nvim'
 
 " Color schemes
 Plug 'fatih/molokai'
-Plug 'dracula/vim'
-
-" Generic autocompletion
-Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-
-" Require for Golang autocompletion
-Plug 'deoplete-plugins/deoplete-go'
-Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
+Plug 'jacoborus/tender.vim'
+Plug 'catppuccin/nvim', { 'as': 'catppuccin' }
+Plug 'EdenEast/nightfox.nvim'
+Plug 'nyoom-engineering/nyoom.nvim'
+Plug 'dracula/vim', { 'as': 'dracula' }
+Plug 'sainnhe/sonokai'
 
 " Initialize plugin system
 call plug#end()
 
-" Enable deoplete
-let g:deoplete#enable_at_startup = 1
 
-" Set up python3
-let g:python3_host_prog = expand('$HOME/neovim-python3/bin/python3')
+set nocompatible
+let g:python3_host_prog = expand('$HOME/.config/nvim/venv/bin/python')
 
 " Set leader key
 let g:mapleader=","
 
-filetype plugin on
-filetype indent on
+filetype off
+filetype plugin indent on
 
-if exists('$TMUX')
-  if has('nvim')
-    set termguicolors
-  endif
+" color
+syntax enable
+" let g:rehash256 = 1
+set t_Co=256
+set background=dark
+set guifont=Hack
+colorscheme sonokai
+
+if (has("termguicolors"))
+ set termguicolors
 endif
 
-if executable('rg')
-  let g:ackprg = 'rg --vimgrep'
-endif
+nmap <C-P> :FZF<CR>
+let $FZF_DEFAULT_COMMAND = 'ag -g ""'
 
 set ttyfast
 set nocp                        " Use non-compatible mode
@@ -102,16 +101,17 @@ set cursorline							 " Show position of cursor
 set updatetime=300
 set pumheight=10             " Completion window max size
 set conceallevel=2           " Concealed text is completely hidden
-"set shortmess+=c   					 " Shut off completion messages
+set shortmess+=c   					 " Shut off completion messages
 set belloff+=ctrlg 					 " If Vim beeps during completion
 set lazyredraw 								" Don't redraw while executing macros (good performance config)
 set ruler " Show line, column number and relative position
 set foldcolumn=0
 set wildmenu
-set wildignore+=*/.git/*,*/.hg/*,*/.svn/*,*/.idea/*,*/.DS_Store,*/vendor,*/coverage/*,*/doc/*,*/node_modules/*,*/build/*,*/go_appengine/*,*/.glide/*
+set wildignore+=*/.git/*,*/.hg/*,*/.svn/*,*/.idea/*,*/.DS_Store,*/vendor,*/coverage/*,*/doc/*,*/node_modules/*,*/build/*,*/go_appengine/*,*/.glide/*,*/site-packages/*,*/venv/*,*/dependencies/python*
 
-inoremap jj <esc>
+" inoremap jj <esc>
 
+let g:vim_markdown_conceal = 1
 
 """"""""""""""""""""""""""
 " Text
@@ -132,6 +132,7 @@ set maxmempattern=20000
 " ~/.viminfo needs to be writable and readable. Set oldfiles to 1000 last
 " recently opened files, :FzfHistory uses it
 set viminfo='1000
+set shada='1000
 
 set foldmethod=syntax
 set foldnestmax=50
@@ -139,107 +140,272 @@ set nofoldenable
 
 if has('persistent_undo')
   set undofile
-  set undodir=~/.cache/vim
+  set undodir=~/.cache/nvim
 endif
 
-" color
-syntax enable
-colorscheme molokai
-let g:rehash256 = 1
-set t_Co=256
-set background=dark
-set guifont=Hack
 
-" Set error color
-hi Error guifg=#c41d1d guibg=#c41d1d 
-
+" colorscheme tender
+" colorscheme molokai
 
 " vim-airline configuration
 let g:airline_powerline_fonts = 1
-let g:airline_theme='minimalist'
-
-" Deoplete
-" <TAB>: completion.
-inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
-
-" JSON Plugin
-let g:vim_json_syntax_conceal = 0
-
-" Neomake
-autocmd! BufWritePost * Neomake
-
-""""""""""""""""""""""""""""""""""""""
-" Go configuration
-""""""""""""""""""""""""""""""""""""""
-"let g:neomake_go_enabled_makers = ['go', 'gometalinter']
-call deoplete#custom#option('omni_patterns', { 'go': '[^. *\t]\.\w*' })
-
-" deoplete-go settings
-let g:deoplete#sources#go#sort_class = ['package', 'func', 'type', 'var', 'const']
-let g:deoplete#sources#go#pointer = 1
-
-" vim-go plugin configuration
-let g:go_auto_sameids = 1
-let g:go_auto_type_info = 0
-let g:go_fmt_autosave = 1
-let g:go_fmt_command = "goimports" 
-let g:go_highlight_build_constraints = 1
-let g:go_highlight_fields = 1
-let g:go_highlight_functions = 1
-let g:go_highlight_interfaces = 1
-let g:go_highlight_methods = 1
-let g:go_highlight_operators = 1
-let g:go_highlight_structs = 1
-
-" Enable folding
-let g:go_fold_enable = ['block', 'import', 'varconst', 'package_comment']
-
-" Use `gopls` instead of `gocode`
-let g:go_info_mode="gopls"
-let g:go_def_mode="gopls" 
-
-let g:go_list_type = "quickfix"
-let g:go_list_autoclose = 1
-let g:go_metalinter_autosave = 1
-let g:go_metalinter_autosave_enabled = ['vet'] " Only use govet
-let g:go_metalinter_enabled = ['vet', 'errcheck']
-
-
-au FileType go nmap <leader>gr <Plug>(go-rename)
-au FileType go nmap <leader>gd :GoDef<CR>
-au FileType go nmap <leader>gt <Plug>(go-test)
-au FileType go nmap <leader>gf :GoFmt<CR>
-au FileType go nmap <leader>gi :GoInfo<CR>
-au FileType go nmap <leader>gc :GoCoverageToggle<CR>
-au FileType go nmap <leader>t :TagbarToggle<CR>
-au FileType go nmap <leader>gec :GoErrCheck<CR>
-au FileType go nmap <leader>gD :GoDoc<CR>
-au FileType go nmap <leader>gcs :GoDecls<CR>
-au FileType go nmap <leader>gb :GoBuild<CR>
+let g:airline_theme='tender'
 
 
 """"""""""""""""""""""""""""""""""""""
-" Misc
+" Coc extensions to install
 """"""""""""""""""""""""""""""""""""""
+
 " Return to last edit position when opening files (You want this!)
 autocmd BufReadPost *
      \ if line("'\"") > 0 && line("'\"") <= line("$") |
      \   exe "normal! g`\"" |
      \ endif
-nmap <leader>S :source $MYVIMRC<cr>
+nmap <leader>S :source $MYVIMRC<CR>
 
 
+
+""""""""""""""""""""""""""""""""
+" coc.nvim
+"
+""""""""""""""""""""""""""""""""
+au BufRead,BufNewFile *.json5 setfiletype json
+let g:coc_filetype_map = {
+  \ 'json.json5': 'json',
+  \ }
+
+let g:coc_global_extensions = [
+      \'coc-eslint',
+      \'coc-tsserver',
+      \'coc-json', 
+      \'coc-pyright', 
+      \'coc-markdownlint',
+      \]
+
+function! s:check_back_space() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~# '\s'
+endfunction
+
+" Use tab for trigger completion with characters ahead and navigate.
+" NOTE: There's always complete item selected by default, you may want to enable
+" no select by `"suggest.noselect": true` in your configuration file.
+" NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped by
+" other plugin before putting this into your config.
+inoremap <silent><expr> <TAB>
+      \ coc#pum#visible() ? coc#pum#next(1) :
+      \ CheckBackspace() ? "\<Tab>" :
+      \ coc#refresh()
+inoremap <expr><S-TAB> coc#pum#visible() ? coc#pum#prev(1) : "\<C-h>"
+" Make <CR> to accept selected completion item or notify coc.nvim to format
+" <C-g>u breaks current undo, please make your own choice.
+inoremap <silent><expr> <CR> coc#pum#visible() ? coc#pum#confirm()
+      \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
+
+
+" don't give |ins-completion-menu| messages.
+set shortmess+=c
+
+" always show signcolumns
+set signcolumn=yes
+
+hi CocSearch ctermfg=12 guifg=#18A3FF
+hi CocMenuSel ctermbg=109 guibg=#13354A
+
+" Use <c-space> to trigger completion.
+inoremap <silent><expr> <c-space> coc#refresh()
+
+function! CheckBackspace() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~# '\s'
+endfunction
+
+" Use `[g` and `]g` to navigate diagnostics
+nmap <silent> [g <Plug>(coc-diagnostic-prev)
+nmap <silent> ]g <Plug>(coc-diagnostic-next)
+
+" Remap keys for gotos
+nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> gy <Plug>(coc-type-definition)
+nmap <silent> gi <Plug>(coc-implementation)
+nmap <silent> gr <Plug>(coc-references)
+nmap <silent> gl <Plug>(coc-diagnostics-toggle)
+
+" Use K to show documentation in preview window
+nnoremap <silent> K :call <SID>show_documentation()<CR>
+
+
+function! s:show_documentation()
+  if (index(['vim','help'], &filetype) >= 0)
+    execute 'h '.expand('<cword>')
+  else
+    call CocAction('doHover')
+  endif
+endfunction
+
+" Highlight symbol under cursor on CursorHold
+autocmd CursorHold * silent call CocActionAsync('highlight')
+
+" Remap for rename current word
+nmap <leader>rn <Plug>(coc-rename)
+
+" Remap for format selected region
+xmap <leader>f  <Plug>(coc-format-selected)
+nmap <leader>f  <Plug>(coc-format-selected)
+
+augroup mygroup
+  autocmd!
+  " Setup formatexpr specified filetype(s).
+  autocmd FileType typescript,json setl formatexpr=CocAction('formatSelected')
+  " Update signature help on jump placeholder
+  autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
+augroup end
+
+" Remap for do codeAction of selected region, ex: `<leader>aap` for current paragraph
+xmap <leader>a  <Plug>(coc-codeaction-selected)
+nmap <leader>a  <Plug>(coc-codeaction-selected)
+
+" Remap for do codeAction of current line
+nmap <leader>ac  <Plug>(coc-codeaction)
+" Fix autofix problem of current line
+nmap <leader>qf  <Plug>(coc-fix-current)
+
+" Create mappings for function text object, requires document symbols feature of languageserver.
+xmap if <Plug>(coc-funcobj-i)
+xmap af <Plug>(coc-funcobj-a)
+omap if <Plug>(coc-funcobj-i)
+omap af <Plug>(coc-funcobj-a)
+
+" Use <C-d> for select selections ranges, needs server support, like: coc-tsserver, coc-python
+nmap <silent> <C-d> <Plug>(coc-range-select)
+xmap <silent> <C-d> <Plug>(coc-range-select)
+
+" Use `:Format` to format current buffer
+command! -nargs=0 Format :call CocAction('format')
+
+" Use `:Fold` to fold current buffer
+command! -nargs=? Fold :call     CocAction('fold', <f-args>)
+
+" use `:OR` for organize import of current buffer
+command! -nargs=0 OR   :call     CocAction('runCommand', 'editor.action.organizeImport')
+
+" Add status line support, for integration with other plugin, checkout `:h coc-status`
+set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
+
+" Using CocList
+" Show all diagnostics
+nnoremap <silent> <space>a  :<C-u>CocList diagnostics<cr>
+" Manage extensions
+nnoremap <silent> <space>e  :<C-u>CocList extensions<cr>
+" Show commands
+nnoremap <silent> <space>c  :<C-u>CocList commands<cr>
+" Find symbol of current document
+nnoremap <silent> <space>o  :<C-u>CocList outline<cr>
+" Search workspace symbols
+nnoremap <silent> <space>s  :<C-u>CocList -I symbols<cr>
+" Do default action for next item.
+nnoremap <silent> <space>j  :<C-u>CocNext<CR>
+" Do default action for previous item.
+nnoremap <silent> <space>k  :<C-u>CocPrev<CR>
+" Resume latest coc list
+nnoremap <silent> <space>p  :<C-u>CocListResume<CR>
+
+nnoremap <silent> <space>i  :call CocAction('runCommand', 'editor.action.organizeImport')<CR>
+"""""""""""
+
 """"""""""""""""""""""""""""""""""""""
-" Nerd Commenter
+" NERDCommenter
 """"""""""""""""""""""""""""""""""""""
-"  Align line-wise comment delimiters flush left instead of following code indentation
+
+" Add spaces after comment delimiters by default
+let g:NERDSpaceDelims = 1
+
+" Use compact syntax for prettified multi-line comments
+let g:NERDCompactSexyComs = 1
+
+" Align line-wise comment delimiters flush left instead of following code indentation
 let g:NERDDefaultAlign = 'left'
 
+" To use NERDCommenter with Vue files, you can use its "hooks" feature to temporarily change the filetype. Click for an example.
+let g:ft = ''
+function! NERDCommenter_before()
+  if &ft == 'vue'
+    let g:ft = 'vue'
+    let stack = synstack(line('.'), col('.'))
+    if len(stack) > 0
+      let syn = synIDattr((stack)[0], 'name')
+      if len(syn) > 0
+        exe 'setf ' . substitute(tolower(syn), '^vue_', '', '')
+      endif
+    endif
+  endif
+endfunction
+function! NERDCommenter_after()
+  if g:ft == 'vue'
+    setf vue
+    let g:ft = ''
+  endif
+endfunction
+
 
 """"""""""""""""""""""""""""""""""""""
-" Nerd Tree
+" vim-table-mode
 """"""""""""""""""""""""""""""""""""""
-let g:NERDTreeDirArrowExpandable = '▸'
-let g:NERDTreeDirArrowCollapsible = '▾'
-let NERDTreeHijackNetrw = 0
-map <leader>nt :NERDTreeToggle<CR>
+
+" Enable markdown-compatible tables
+let g:table_mode_corner='|'
+
+
+let g:LanguageClient_serverCommands = {
+    \ 'vue': ['vls']
+    \ }
+
+" Run gofmt on save
+" autocmd BufWritePre *.go :call LanguageClient#textDocument_formatting_sync()
+
+
+"""""""""""""""""""""""""""""""""""""""
+" Non-standard Makefile names
+"""""""""""""""""""""""""""""""""""""""
+autocmd BufEnter Makefile.local :setlocal filetype=make
+autocmd BufEnter Makefile.* :setlocal filetype=make
+
+
+""""""""""""""""""""""""""""""""""""""""
+" Yapf
+""""""""""""""""""""""""""""""""""""""""
+au FileType python nmap <leader>f :Yapf<CR>
+
+""""""""""""""""""""""""""""""""""""""""
+" Typescript
+""""""""""""""""""""""""""""""""""""""""
+nnoremap <leader>oi :call CocAction('runCommand', 'tsserver.organizeImports')<CR>
+nmap <leader>rn <Plug>(coc-rename)
+
+""""""""""""""""""""""""""""""""""""""""
+" Python Deoplete
+""""""""""""""""""""""""""""""""""""""""
+" let g:python3_host_prog = '$HOME/.config/nvim/env/bin/python'
+" let g:deoplete#sources#jedi#enable_short_types = 1
+" let g:deoplete#sources#jedi#show_docstring = 1
+com! FormatJSON %!python -m json.tool
+
+command! FmtJSON :execute '%!jq .'
+
+aug python
+  au!
+  au BufWrite *.py call CocAction('format')
+aug END
+
+
+
+lua << EOF
+require("nnn").setup()
+require("oil").setup({
+  columns = {
+    "icon"
+  }
+})
+require("nvim-web-devicons").setup()
+vim.keymap.set("n", "-", require("oil").open, { desc = "Open parent directory" })
+EOF
